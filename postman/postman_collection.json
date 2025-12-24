@@ -148,8 +148,8 @@
               {"key": "Accept", "value": "application/vnd.github.v3+json"}
             ],
             "url": { "raw": "{{base_url}}/repos/{{owner}}/{{repo}}/pulls/{{pull_number}}/commits",
-                   "host": ["{{base_url}}"],
-                   "path": ["repos","{{owner}}","{{repo}}","pulls","{{pull_number}}","commits"]
+                  "host": ["{{base_url}}"],
+                  "path": ["repos","{{owner}}","{{repo}}","pulls","{{pull_number}}","commits"]
             }
           }
         }
