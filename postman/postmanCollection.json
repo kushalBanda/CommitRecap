@@ -209,6 +209,38 @@
       }
     },
     {
+      "name": "Contribution Heatmap (Weekly)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/github/search/contribution-heatmap?username={{username}}&since={{since}}&until={{until}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "github",
+            "search",
+            "contribution-heatmap"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            },
+            {
+              "key": "since",
+              "value": "{{since}}"
+            },
+            {
+              "key": "until",
+              "value": "{{until}}"
+            }
+          ]
+        }
+      }
+    },
+    {
       "name": "Fetch Most Used Languages",
       "request": {
         "method": "GET",
