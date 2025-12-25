@@ -9,6 +9,6 @@ from server.api.routers.github_search_router import (
     router as github_search_router,
 )
 
-app = FastAPI(title="CommitRecap API")
+app = FastAPI(title="CommitRecap")
 
 app.include_router(github_search_router)
