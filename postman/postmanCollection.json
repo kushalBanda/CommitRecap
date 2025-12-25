@@ -1,0 +1,250 @@
+{
+  "info": {
+    "name": "CommitRecap Backend API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "username",
+      "value": "octocat"
+    },
+    {
+      "key": "since",
+      "value": "2025-01-01T00:00:00Z"
+    },
+    {
+      "key": "until",
+      "value": "2025-12-31T23:59:59Z"
+    },
+    {
+      "key": "perPage",
+      "value": "100"
+    },
+    {
+      "key": "page",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Issue Count (Author, Date Range)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/github/search/issues?username={{username}}&since={{since}}&until={{until}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "github",
+            "search",
+            "issues"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            },
+            {
+              "key": "since",
+              "value": "{{since}}"
+            },
+            {
+              "key": "until",
+              "value": "{{until}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "PR Count (Author, Date Range)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/github/search/prs?username={{username}}&since={{since}}&until={{until}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "github",
+            "search",
+            "prs"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            },
+            {
+              "key": "since",
+              "value": "{{since}}"
+            },
+            {
+              "key": "until",
+              "value": "{{until}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "PR Count Reviewed by User (Date Range)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/github/search/prs-reviewed?username={{username}}&since={{since}}&until={{until}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "github",
+            "search",
+            "prs-reviewed"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            },
+            {
+              "key": "since",
+              "value": "{{since}}"
+            },
+            {
+              "key": "until",
+              "value": "{{until}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Merged PR Count (Date Range)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/github/search/prs-merged?username={{username}}&since={{since}}&until={{until}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "github",
+            "search",
+            "prs-merged"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            },
+            {
+              "key": "since",
+              "value": "{{since}}"
+            },
+            {
+              "key": "until",
+              "value": "{{until}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Commit Count (Author, Date Range)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/github/search/commit-count?username={{username}}&since={{since}}&until={{until}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "github",
+            "search",
+            "commit-count"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            },
+            {
+              "key": "since",
+              "value": "{{since}}"
+            },
+            {
+              "key": "until",
+              "value": "{{until}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Repo Count (Public)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/github/search/repo-count?username={{username}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "github",
+            "search",
+            "repo-count"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Fetch Most Used Languages",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/github/search/languages?username={{username}}&per_page={{perPage}}&page={{page}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "github",
+            "search",
+            "languages"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            },
+            {
+              "key": "per_page",
+              "value": "{{perPage}}"
+            },
+            {
+              "key": "page",
+              "value": "{{page}}"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
