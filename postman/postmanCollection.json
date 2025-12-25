@@ -167,6 +167,30 @@
       }
     },
     {
+      "name": "Repo Focus + Collaboration Footprint",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/github/search/repo-focus?username={{username}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "github",
+            "search",
+            "repo-focus"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            }
+          ]
+        }
+      }
+    },
+    {
       "name": "Repo Count (Public)",
       "request": {
         "method": "GET",
