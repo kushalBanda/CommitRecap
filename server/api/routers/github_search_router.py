@@ -119,3 +119,17 @@ def fetch_year_summary(
         since=since,
         until=until,
     )
+
+
+@router.get("/contribution-heatmap")
+def fetch_contribution_heatmap(
+    username: str = Query(..., min_length=1),
+    since: str = Query(DEFAULT_START_DATE, min_length=1),
+    until: str = Query(DEFAULT_END_DATE, min_length=1),
+):
+    """Fetch contribution calendar heatmap for a date range."""
+    return github_search_controller.fetch_contribution_heatmap(
+        username=username,
+        since=since,
+        until=until,
+    )
