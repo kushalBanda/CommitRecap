@@ -1,0 +1,12 @@
+[project]
+name = "server"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]>=0.115.0",
+    "orjson>=3.11.5",
+    "requests>=2.32.5",
+    "uvicorn>=0.30.0",
+]
