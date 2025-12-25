@@ -12,8 +12,14 @@ from server.config.env import Environment
 
 GITHUB_BASE_URL = Environment.GITHUB_BASE_URL
 GITHUB_TOKEN = Environment.GITHUB_TOKEN
-DEFAULT_START_DATE = Environment.START_DATE
-DEFAULT_END_DATE = Environment.END_DATE
+DEFAULT_START_DATE = Environment.START_DATE or "2025-01-01"
+DEFAULT_END_DATE = Environment.END_DATE or "2025-12-31"
+
+
+def _normalize_datetime(value: str, default_time: str) -> str:
+    if "T" in value:
+        return value
+    return f"{value}{default_time}"
 
 
 def _build_headers(accept: str | None = None) -> Dict[str, str]:
@@ -94,6 +100,8 @@ def fetch_repo_focus_and_collaboration(
     max_workers: int,
 ) -> Dict[str, Any]:
     """Return top repos by commits and distinct repo count for a date range."""
+    since_dt = _normalize_datetime(since, "T00:00:00Z")
+    until_dt = _normalize_datetime(until, "T23:59:59Z")
     query = """
     query($login: String!, $from: DateTime!, $to: DateTime!) {
       user(login: $login) {
@@ -107,7 +115,7 @@ def fetch_repo_focus_and_collaboration(
       }
     }
     """
-    data = _post_graphql(query, {"login": username, "from": since, "to": until})
+    data = _post_graphql(query, {"login": username, "from": since_dt, "to": until_dt})
     collection = (
         data.get("user", {}).get("contributionsCollection", {}) if data else {}
     )
@@ -192,11 +200,6 @@ def fetch_most_used_languages(
     Aggregate language usage for repos contributed to within a date range.
     Returns total bytes and usage percentages across matching repos.
     """
-    def _normalize_datetime(value: str, default_time: str) -> str:
-        if "T" in value:
-            return value
-        return f"{value}{default_time}"
-
     since_dt = _normalize_datetime(since, "T00:00:00Z")
     until_dt = _normalize_datetime(until, "T23:59:59Z")
 
@@ -345,11 +348,6 @@ def fetch_year_summary_cards(
     until: str,
 ) -> Dict[str, Any]:
     """Return year summary totals for commits, issues, PRs, and reviews."""
-    def _normalize_datetime(value: str, default_time: str) -> str:
-        if "T" in value:
-            return value
-        return f"{value}{default_time}"
-
     since_dt = _normalize_datetime(since, "T00:00:00Z")
     until_dt = _normalize_datetime(until, "T23:59:59Z")
 
@@ -377,5 +375,49 @@ def fetch_year_summary_cards(
         "issues": collection.get("totalIssueContributions", 0),
         "pull_requests": collection.get("totalPullRequestContributions", 0),
         "reviews": collection.get("totalPullRequestReviewContributions", 0),
+        "source": "graphql",
+    }
+
+
+def fetch_contribution_heatmap(
+    username: str,
+    since: str,
+    until: str,
+) -> Dict[str, Any]:
+    """Return contribution calendar heatmap for a date range."""
+    since_dt = _normalize_datetime(since, "T00:00:00Z")
+    until_dt = _normalize_datetime(until, "T23:59:59Z")
+
+    query = """
+    query($login: String!, $from: DateTime!, $to: DateTime!) {
+      user(login: $login) {
+        contributionsCollection(from: $from, to: $to) {
+          contributionCalendar {
+            totalContributions
+            weeks {
+              contributionDays {
+                date
+                contributionCount
+                color
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+    data = _post_graphql(query, {"login": username, "from": since_dt, "to": until_dt})
+    calendar_data = (
+        data.get("user", {})
+        .get("contributionsCollection", {})
+        .get("contributionCalendar", {})
+    )
+
+    return {
+        "username": username,
+        "since": since,
+        "until": until,
+        "total_contributions": calendar_data.get("totalContributions", 0),
+        "weeks": calendar_data.get("weeks", []),
         "source": "graphql",
     }
