@@ -84,72 +84,6 @@ def _is_within_range(value: str, since: str, until: str) -> bool:
     return parsed_since <= parsed_value <= parsed_until
 
 
-def search_issues_by_author_date(
-    username: str,
-    since: str,
-    until: str,
-) -> Dict[str, Any]:
-    """Return total issue count authored by a user within a date range."""
-    query = f"author:{username} type:issue created:{since}..{until}"
-    params = {"q": query, "per_page": 1, "page": 1}
-    response = _get("/search/issues", params)
-    return {"total_count": response.get("total_count", 0)}
-
-
-def search_prs_by_author_date(
-    username: str,
-    since: str,
-    until: str,
-) -> Dict[str, Any]:
-    """Return total PR count authored by a user within a date range."""
-    query = f"author:{username} type:pr created:{since}..{until}"
-    params = {"q": query, "per_page": 1, "page": 1}
-    response = _get("/search/issues", params)
-    return {"total_count": response.get("total_count", 0)}
-
-
-def search_prs_reviewed_by_user_date(
-    username: str,
-    since: str,
-    until: str,
-) -> Dict[str, Any]:
-    """Return total PR count reviewed by a user within a date range."""
-    query = f"reviewed-by:{username} type:pr reviewed:{since}..{until}"
-    params = {"q": query, "per_page": 1, "page": 1}
-    response = _get("/search/issues", params)
-    return {"total_count": response.get("total_count", 0)}
-
-
-def search_merged_prs_by_author_date(
-    username: str,
-    since: str,
-    until: str,
-) -> Dict[str, Any]:
-    """Return total merged PR count authored by a user within a date range."""
-    query = f"author:{username} type:pr is:merged merged:{since}..{until}"
-    params = {"q": query, "per_page": 1, "page": 1}
-    response = _get("/search/issues", params)
-    return {"total_count": response.get("total_count", 0)}
-
-
-def fetch_commit_count(
-    username: str,
-    since: str,
-    until: str,
-) -> Dict[str, Any]:
-    """Return the total commit count authored by a user within a date range."""
-    query = f"author:{username} author-date:{since}..{until}"
-    params = {"q": query, "per_page": 1, "page": 1}
-    response = _get("/search/commits", params)
-    return {
-        "username": username,
-        "since": since,
-        "until": until,
-        "commit_count": response.get("total_count", 0),
-        "incomplete_results": response.get("incomplete_results", False),
-    }
-
-
 def fetch_repo_focus_and_collaboration(
     username: str,
     since: str,
@@ -249,25 +183,57 @@ def fetch_commit_count_monthly_2025(username: str) -> Dict[str, Any]:
 
 def fetch_most_used_languages(
     username: str,
+    since: str,
+    until: str,
     per_page: int,
     page: int,
 ) -> Dict[str, Any]:
     """
-    Aggregate language usage for repos.
+    Aggregate language usage for repos contributed to within a date range.
     Returns total bytes and usage percentages across matching repos.
     """
-    repos_params = {"per_page": per_page, "page": page, "sort": "updated"}
-    repos = _get(f"/users/{username}/repos", repos_params)
+    def _normalize_datetime(value: str, default_time: str) -> str:
+        if "T" in value:
+            return value
+        return f"{value}{default_time}"
+
+    since_dt = _normalize_datetime(since, "T00:00:00Z")
+    until_dt = _normalize_datetime(until, "T23:59:59Z")
+
+    query = """
+    query($login: String!, $from: DateTime!, $to: DateTime!) {
+      user(login: $login) {
+        contributionsCollection(from: $from, to: $to) {
+          commitContributionsByRepository(maxRepositories: 100) {
+            repository {
+              nameWithOwner
+              languages(first: 20, orderBy: {field: SIZE, direction: DESC}) {
+                edges {
+                  size
+                  node { name }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+    data = _post_graphql(query, {"login": username, "from": since_dt, "to": until_dt})
+    repos = (
+        data.get("user", {})
+        .get("contributionsCollection", {})
+        .get("commitContributionsByRepository", [])
+    )
 
     language_totals: dict[str, int] = {}
     for repo in repos:
-        owner = repo.get("owner", {}).get("login")
-        name = repo.get("name")
-        if not owner or not name:
-            continue
-
-        languages = _get(f"/repos/{owner}/{name}/languages", {})
-        for language, bytes_count in languages.items():
+        edges = repo.get("repository", {}).get("languages", {}).get("edges", [])
+        for edge in edges:
+            language = edge.get("node", {}).get("name")
+            bytes_count = edge.get("size", 0)
+            if not language:
+                continue
             language_totals[language] = language_totals.get(language, 0) + bytes_count
 
     total_bytes = sum(language_totals.values())
@@ -278,11 +244,14 @@ def fetch_most_used_languages(
 
     return {
         "username": username,
+        "since": since,
+        "until": until,
         "page": page,
         "per_page": per_page,
         "total_bytes": total_bytes,
         "languages": language_totals,
         "percentages": percentages,
+        "source": "graphql",
     }
 
 
@@ -367,4 +336,46 @@ def fetch_top_languages_by_repo_stars(
         "page": page,
         "per_page": per_page,
         "languages": ranked,
+    }
+
+
+def fetch_year_summary_cards(
+    username: str,
+    since: str,
+    until: str,
+) -> Dict[str, Any]:
+    """Return year summary totals for commits, issues, PRs, and reviews."""
+    def _normalize_datetime(value: str, default_time: str) -> str:
+        if "T" in value:
+            return value
+        return f"{value}{default_time}"
+
+    since_dt = _normalize_datetime(since, "T00:00:00Z")
+    until_dt = _normalize_datetime(until, "T23:59:59Z")
+
+    query = """
+    query($login: String!, $from: DateTime!, $to: DateTime!) {
+      user(login: $login) {
+        contributionsCollection(from: $from, to: $to) {
+          totalCommitContributions
+          totalIssueContributions
+          totalPullRequestContributions
+          totalPullRequestReviewContributions
+        }
+      }
+    }
+    """
+    data = _post_graphql(query, {"login": username, "from": since_dt, "to": until_dt})
+    collection = (
+        data.get("user", {}).get("contributionsCollection", {}) if data else {}
+    )
+    return {
+        "username": username,
+        "since": since,
+        "until": until,
+        "commits": collection.get("totalCommitContributions", 0),
+        "issues": collection.get("totalIssueContributions", 0),
+        "pull_requests": collection.get("totalPullRequestContributions", 0),
+        "reviews": collection.get("totalPullRequestReviewContributions", 0),
+        "source": "graphql",
     }
