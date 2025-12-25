@@ -17,3 +17,7 @@ class Environment():
     # GitHub
     GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
     GITHUB_BASE_URL = os.getenv("GITHUB_BASE_URL")
+
+    # Date Defaults
+    START_DATE = os.getenv("START_DATE")
+    END_DATE = os.getenv("END_DATE")
