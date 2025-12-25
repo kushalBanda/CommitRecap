@@ -282,6 +282,8 @@ def fetch_user_summary(username: str) -> Dict[str, Any]:
         "company": response.get("company"),
         "blog": response.get("blog"),
         "location": response.get("location"),
+        "avatar_url": response.get("avatar_url"),
+        "html_url": response.get("html_url"),
         "public_repos": response.get("public_repos", 0),
         "public_gists": response.get("public_gists", 0),
         "followers": response.get("followers", 0),
