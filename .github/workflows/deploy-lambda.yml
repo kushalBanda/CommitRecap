@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_REGION: us-west-2
+  AWS_REGION: us-east-1
   LAMBDA_FUNCTION_NAME: commitRecap
   PYTHON_VERSION: '3.11'
 
