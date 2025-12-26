@@ -137,3 +137,18 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# chat
+chat/*
+
+
+# Cursor and Claude
+.cursor/
+.claude/
+
+# AGENTS.md and CLAUDE.md
+AGENTS.md
+CLAUDE.md
+
+# MCP
+mcp.json

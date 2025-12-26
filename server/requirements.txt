@@ -1,0 +1,6 @@
+# Generated from pyproject.toml for Render.com deployment
+fastapi[standard]>=0.115.0
+orjson>=3.11.5
+requests>=2.32.5
+uvicorn>=0.30.0
+python-dotenv>=1.0.0

@@ -1,0 +1,284 @@
+{
+  "info": {
+    "name": "CommitRecap Backend API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "username",
+      "value": "octocat"
+    },
+    {
+      "key": "since",
+      "value": "2025-01-01"
+    },
+    {
+      "key": "until",
+      "value": "2025-12-31"
+    },
+    {
+      "key": "perPage",
+      "value": "100"
+    },
+    {
+      "key": "page",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Commit Count Monthly (2025)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/github/search/commit-count-monthly-2025?username={{username}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "github",
+            "search",
+            "commit-count-monthly-2025"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Repo Focus + Collaboration Footprint",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/github/search/repo-focus?username={{username}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "github",
+            "search",
+            "repo-focus"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Repo Count (Public)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/github/search/repo-count?username={{username}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "github",
+            "search",
+            "repo-count"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "User Summary",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/github/search/user-summary?username={{username}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "github",
+            "search",
+            "user-summary"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Rate Limit",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/github/search/rate-limit",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "github",
+            "search",
+            "rate-limit"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Top Languages by Repo Stars",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/github/search/top-languages-by-stars?username={{username}}&per_page={{perPage}}&page={{page}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "github",
+            "search",
+            "top-languages-by-stars"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            },
+            {
+              "key": "per_page",
+              "value": "{{perPage}}"
+            },
+            {
+              "key": "page",
+              "value": "{{page}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Year Summary",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/github/search/year-summary?username={{username}}&since={{since}}&until={{until}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "github",
+            "search",
+            "year-summary"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            },
+            {
+              "key": "since",
+              "value": "{{since}}"
+            },
+            {
+              "key": "until",
+              "value": "{{until}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Contribution Heatmap (Weekly)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/github/search/contribution-heatmap?username={{username}}&since={{since}}&until={{until}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "github",
+            "search",
+            "contribution-heatmap"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            },
+            {
+              "key": "since",
+              "value": "{{since}}"
+            },
+            {
+              "key": "until",
+              "value": "{{until}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Fetch Most Used Languages",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/github/search/languages?username={{username}}&since={{since}}&until={{until}}&per_page={{perPage}}&page={{page}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "github",
+            "search",
+            "languages"
+          ],
+          "query": [
+            {
+              "key": "username",
+              "value": "{{username}}"
+            },
+            {
+              "key": "since",
+              "value": "{{since}}"
+            },
+            {
+              "key": "until",
+              "value": "{{until}}"
+            },
+            {
+              "key": "per_page",
+              "value": "{{perPage}}"
+            },
+            {
+              "key": "page",
+              "value": "{{page}}"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
