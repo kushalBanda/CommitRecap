@@ -138,6 +138,9 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+# chat
+chat/*
+
 
 # Cursor and Claude
 .cursor/
@@ -146,3 +149,6 @@ vite.config.ts.timestamp-*
 # AGENTS.md and CLAUDE.md
 AGENTS.md
 CLAUDE.md
+
+# MCP
+mcp.json
