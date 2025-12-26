@@ -23,6 +23,24 @@ def fetch_commit_count_monthly_2025(
     )
 
 
+@router.get("/commit-size-distribution")
+def fetch_commit_size_distribution(
+    username: str = Query(..., min_length=1),
+    since: str = Query(DEFAULT_START_DATE, min_length=1),
+    until: str = Query(DEFAULT_END_DATE, min_length=1),
+    top_repos: int = Query(5, ge=1, le=25),
+    max_commits_per_repo: int = Query(250, ge=10, le=1000),
+):
+    """Fetch commit size distribution and a short narrative."""
+    return github_search_controller.fetch_commit_size_distribution(
+        username=username,
+        since=since,
+        until=until,
+        top_repos=top_repos,
+        max_commits_per_repo=max_commits_per_repo,
+    )
+
+
 @router.get("/repo-focus")
 def fetch_repo_focus_and_collaboration(
     username: str = Query(..., min_length=1),

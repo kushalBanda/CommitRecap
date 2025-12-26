@@ -7,6 +7,7 @@ import { useRecapStore } from "@/stores/recap-store";
 import { OpeningPage } from "@/components/pages/opening-page";
 import { ActivityTimelinePage } from "@/components/pages/activity-timeline-page";
 import { MonthlyJourneyPage } from "@/components/pages/monthly-journey-page";
+import { CommitSizeDistributionPage } from "@/components/pages/commit-size-distribution-page";
 import { TopLanguagesPage } from "@/components/pages/top-languages-page";
 import { BattleCardPage } from "@/components/pages/battle-card-page";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -173,10 +174,13 @@ export default function RecapPage() {
       {/* Page 3: Monthly Journey */}
       <MonthlyJourneyPage />
 
-      {/* Page 4: Top Languages */}
+      {/* Page 4: Commit Size Distribution */}
+      <CommitSizeDistributionPage />
+
+      {/* Page 5: Top Languages */}
       <TopLanguagesPage />
 
-      {/* Page 5: Summary Card */}
+      {/* Page 6: Summary Card */}
       <BattleCardPage />
     </div>
   );

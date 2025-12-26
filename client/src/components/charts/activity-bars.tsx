@@ -8,6 +8,7 @@ interface ActivityBarsProps {
   heatmap: ContributionHeatmap;
   highlightDate?: string;
   highlightLabel?: string;
+  showHighlightLabel?: boolean;
   showMonthLabels?: boolean;
   className?: string;
   barWidth?: number;
@@ -27,6 +28,7 @@ export function ActivityBars({
   heatmap,
   highlightDate,
   highlightLabel,
+  showHighlightLabel = true,
   showMonthLabels = true,
   className = "",
   barWidth = 3,
@@ -111,7 +113,7 @@ export function ActivityBars({
       )}
 
       {/* Highlight label for peak */}
-      {(highlightLabel || isHighlighted(peakDay.date)) && !hoveredDay && (
+      {showHighlightLabel && (highlightLabel || isHighlighted(peakDay.date)) && !hoveredDay && (
         <div className="absolute top-0 left-1/2 -translate-x-1/2 text-center pointer-events-none">
           <p className="text-xs text-muted-foreground">{formatDate(highlightDate || peakDay.date)}</p>
           <p className="text-sm font-medium text-foreground">{highlightLabel || "Peak Activity"}</p>
@@ -254,4 +256,3 @@ export function ActivityBarsBackground({
     </div>
   );
 }
-

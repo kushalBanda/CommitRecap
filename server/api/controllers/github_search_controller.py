@@ -90,6 +90,43 @@ def _is_within_range(value: str, since: str, until: str) -> bool:
     return parsed_since <= parsed_value <= parsed_until
 
 
+def _percentile(sorted_values: list[int], percentile: float) -> int:
+    if not sorted_values:
+        return 0
+    if percentile <= 0:
+        return sorted_values[0]
+    if percentile >= 100:
+        return sorted_values[-1]
+    index = (len(sorted_values) - 1) * (percentile / 100)
+    lower = int(index)
+    upper = min(lower + 1, len(sorted_values) - 1)
+    if lower == upper:
+        return sorted_values[lower]
+    weight = index - lower
+    return int(sorted_values[lower] * (1 - weight) + sorted_values[upper] * weight)
+
+
+def _build_commit_size_story(stats: Dict[str, Any]) -> str:
+    if stats["count"] == 0:
+        return "No commits found in the selected window."
+    median = stats["median"]
+    p90 = stats["p90"]
+    avg = stats["average"]
+    if median <= 20 and p90 <= 120:
+        tone = "Mostly small, steady commits with occasional medium pushes."
+    elif median <= 60 and p90 <= 300:
+        tone = "Balanced mix of routine commits and periodic larger changes."
+    elif median <= 120 and p90 <= 600:
+        tone = "Frequent medium-to-large commits; bigger change sets show up often."
+    else:
+        tone = "Large, chunky commits dominate the period."
+    if avg > median * 1.6:
+        tail = "A few very large commits skew the average upward."
+    else:
+        tail = "Commit sizes stay relatively consistent."
+    return f"{tone} {tail}"
+
+
 def fetch_repo_focus_and_collaboration(
     username: str,
     since: str,
@@ -185,6 +222,159 @@ def fetch_commit_count_monthly_2025(username: str) -> Dict[str, Any]:
         "username": username,
         "year": year,
         "monthly_counts": monthly_counts,
+        "source": "graphql",
+    }
+
+
+def fetch_commit_size_distribution(
+    username: str,
+    since: str,
+    until: str,
+    top_repos: int,
+    max_commits_per_repo: int,
+) -> Dict[str, Any]:
+    """Return commit size distribution and a short narrative."""
+    since_dt = _normalize_datetime(since, "T00:00:00Z")
+    until_dt = _normalize_datetime(until, "T23:59:59Z")
+
+    user_query = """
+    query($login: String!, $from: DateTime!, $to: DateTime!) {
+      user(login: $login) {
+        id
+        contributionsCollection(from: $from, to: $to) {
+          commitContributionsByRepository(maxRepositories: 100) {
+            repository {
+              nameWithOwner
+              defaultBranchRef { name }
+            }
+            contributions { totalCount }
+          }
+        }
+      }
+    }
+    """
+    user_data = _post_graphql(
+        user_query, {"login": username, "from": since_dt, "to": until_dt}
+    )
+    user = user_data.get("user", {}) if user_data else {}
+    user_id = user.get("id")
+    repos = (
+        user.get("contributionsCollection", {}).get("commitContributionsByRepository", [])
+    )
+    ranked_repos = sorted(
+        (
+            {
+                "repo": repo.get("repository", {}).get("nameWithOwner"),
+                "default_branch": repo.get("repository", {})
+                .get("defaultBranchRef", {})
+                .get("name"),
+                "commit_count": repo.get("contributions", {}).get("totalCount", 0),
+            }
+            for repo in repos
+            if repo.get("repository", {}).get("nameWithOwner")
+        ),
+        key=lambda entry: entry["commit_count"],
+        reverse=True,
+    )[:top_repos]
+
+    history_query = """
+    query(
+      $repo_owner: String!,
+      $repo_name: String!,
+      $from: GitTimestamp,
+      $until: GitTimestamp,
+      $author: ID,
+      $after: String
+    ) {
+      repository(owner: $repo_owner, name: $repo_name) {
+        defaultBranchRef {
+          target {
+            ... on Commit {
+              history(first: 100, since: $from, until: $until, author: {id: $author}, after: $after) {
+                nodes {
+                  additions
+                  deletions
+                  changedFiles
+                  committedDate
+                }
+                pageInfo {
+                  hasNextPage
+                  endCursor
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+
+    sizes: list[int] = []
+    per_repo_counts: dict[str, int] = {}
+    for repo_entry in ranked_repos:
+        repo_full = repo_entry["repo"]
+        if not repo_full or "/" not in repo_full:
+            continue
+        owner, name = repo_full.split("/", 1)
+        collected = 0
+        after = None
+        while collected < max_commits_per_repo:
+            data = _post_graphql(
+                history_query,
+                {
+                    "repo_owner": owner,
+                    "repo_name": name,
+                    "from": since_dt,
+                    "until": until_dt,
+                    "author": user_id,
+                    "after": after,
+                },
+            )
+            history = (
+                data.get("repository", {})
+                .get("defaultBranchRef", {})
+                .get("target", {})
+                .get("history", {})
+            )
+            nodes = history.get("nodes", []) if history else []
+            if not nodes:
+                break
+            for node in nodes:
+                if collected >= max_commits_per_repo:
+                    break
+                additions = int(node.get("additions", 0))
+                deletions = int(node.get("deletions", 0))
+                sizes.append(additions + deletions)
+                collected += 1
+            page_info = history.get("pageInfo", {})
+            if not page_info.get("hasNextPage"):
+                break
+            after = page_info.get("endCursor")
+        if collected:
+            per_repo_counts[repo_full] = collected
+
+    sizes.sort()
+    count = len(sizes)
+    stats = {
+        "count": count,
+        "min": sizes[0] if sizes else 0,
+        "max": sizes[-1] if sizes else 0,
+        "median": _percentile(sizes, 50),
+        "p75": _percentile(sizes, 75),
+        "p90": _percentile(sizes, 90),
+        "p95": _percentile(sizes, 95),
+        "average": round(sum(sizes) / count, 2) if count else 0,
+    }
+
+    return {
+        "username": username,
+        "since": since,
+        "until": until,
+        "top_repos": top_repos,
+        "max_commits_per_repo": max_commits_per_repo,
+        "stats": stats,
+        "per_repo_commit_counts": per_repo_counts,
+        "story": _build_commit_size_story(stats),
         "source": "graphql",
     }
 
