@@ -37,15 +37,18 @@ jobs:
           # Create deployment directory
           mkdir -p deployment
 
-          # Copy application code only (no dependencies)
+          # Copy core files
+          echo "Copying core files..."
           cp main.py deployment/
           cp lambda_handler.py deployment/
-          cp -r api deployment/
-          cp -r config deployment/
-          cp -r schemas deployment/
-          cp -r services deployment/
-          cp -r utils deployment/
-          cp -r telemetry deployment/ 2>/dev/null || true
+
+          # Copy directories (with error handling)
+          for dir in api config schemas services utils telemetry app; do
+            if [ -d "$dir" ]; then
+              cp -r "$dir" deployment/
+              echo "✓ Copied $dir"
+            fi
+          done
 
           # Create zip file (excluding unnecessary files)
           cd deployment
@@ -55,16 +58,17 @@ jobs:
             "*.pyc" \
             ".env" \
             ".DS_Store" \
-            "*.venv*"
+            "*.venv*" \
+            ".pytest_cache*"
           cd ..
 
           # Show zip size and contents
+          echo ""
           echo "📦 Deployment package created:"
           ls -lh lambda-deployment.zip
           echo ""
           echo "📄 Package contents:"
-          unzip -l lambda-deployment.zip | head -25
-          echo "..."
+          unzip -l lambda-deployment.zip | head -30
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
