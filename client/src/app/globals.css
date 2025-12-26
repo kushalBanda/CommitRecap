@@ -8,6 +8,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-instrument-serif);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -46,54 +47,73 @@
   --radius-4xl: calc(var(--radius) + 16px);
 }
 
-/* GitHub Dark Theme - Always dark mode */
+/* Cinematic Dark Theme - Story-driven aesthetic */
 :root {
   --radius: 0.625rem;
 
-  /* GitHub Dark Colors */
-  --background: #0d1117;
-  --foreground: #c9d1d9;
-  --card: #161b22;
-  --card-foreground: #c9d1d9;
-  --popover: #161b22;
-  --popover-foreground: #c9d1d9;
-  --primary: #39d353;
-  --primary-foreground: #0d1117;
-  --secondary: #21262d;
-  --secondary-foreground: #c9d1d9;
-  --muted: #21262d;
-  --muted-foreground: #8b949e;
-  --accent: #238636;
-  --accent-foreground: #ffffff;
-  --destructive: #f85149;
-  --border: #30363d;
-  --input: #21262d;
-  --ring: #58a6ff;
+  /* Near-black background for cinematic feel */
+  --background: #0a0a0a;
+  --foreground: #e5e5e5;
+  
+  /* Card - slightly lighter for contrast */
+  --card: #141414;
+  --card-foreground: #e5e5e5;
+  
+  /* Popover */
+  --popover: #141414;
+  --popover-foreground: #e5e5e5;
+  
+  /* Primary - Orange accent for highlights */
+  --primary: #f97316;
+  --primary-foreground: #0a0a0a;
+  
+  /* Secondary */
+  --secondary: #1a1a1a;
+  --secondary-foreground: #e5e5e5;
+  
+  /* Muted - Gray tones */
+  --muted: #1a1a1a;
+  --muted-foreground: #737373;
+  
+  /* Accent */
+  --accent: #f97316;
+  --accent-foreground: #0a0a0a;
+  
+  /* Destructive */
+  --destructive: #ef4444;
+  
+  /* Border */
+  --border: #262626;
+  --input: #1a1a1a;
+  --ring: #f97316;
 
-  /* GitHub Green Gradient for charts */
-  --chart-1: #39d353;
-  --chart-2: #26a641;
-  --chart-3: #006d32;
-  --chart-4: #0e4429;
-  --chart-5: #58a6ff;
+  /* Chart colors - Orange accent with gray scale */
+  --chart-1: #f97316;
+  --chart-2: #525252;
+  --chart-3: #404040;
+  --chart-4: #262626;
+  --chart-5: #171717;
 
-  /* GitHub contribution colors */
-  --github-green-1: #0e4429;
-  --github-green-2: #006d32;
-  --github-green-3: #26a641;
-  --github-green-4: #39d353;
-  --github-accent: #58a6ff;
-  --github-purple: #a371f7;
-  --github-orange: #db6d28;
+  /* Activity bar colors */
+  --bar-active: #f97316;
+  --bar-inactive: #262626;
+  --bar-highlight: #fb923c;
+  
+  /* Dot grid colors for heatmap */
+  --dot-empty: #1a1a1a;
+  --dot-low: #525252;
+  --dot-medium: #737373;
+  --dot-high: #f97316;
 
-  --sidebar: #161b22;
-  --sidebar-foreground: #c9d1d9;
-  --sidebar-primary: #39d353;
-  --sidebar-primary-foreground: #0d1117;
-  --sidebar-accent: #21262d;
-  --sidebar-accent-foreground: #c9d1d9;
-  --sidebar-border: #30363d;
-  --sidebar-ring: #58a6ff;
+  /* Sidebar (keeping for compatibility) */
+  --sidebar: #0a0a0a;
+  --sidebar-foreground: #e5e5e5;
+  --sidebar-primary: #f97316;
+  --sidebar-primary-foreground: #0a0a0a;
+  --sidebar-accent: #1a1a1a;
+  --sidebar-accent-foreground: #e5e5e5;
+  --sidebar-border: #262626;
+  --sidebar-ring: #f97316;
 }
 
 @layer base {
@@ -103,4 +123,127 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Typography utilities */
+.font-serif {
+  font-family: var(--font-instrument-serif), Georgia, serif;
+}
+
+/* Large display text for stats */
+.text-display {
+  font-size: clamp(4rem, 12vw, 8rem);
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.text-display-sm {
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  line-height: 1.1;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+/* Narrative text styling */
+.text-narrative {
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  line-height: 1.4;
+  color: var(--foreground);
+}
+
+.text-narrative-muted {
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  line-height: 1.4;
+  color: var(--muted-foreground);
+}
+
+/* Keyboard hint styling */
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-family: var(--font-geist-mono);
+  color: var(--muted-foreground);
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: 0.25rem;
+  min-width: 1.5rem;
+}
+
+/* Activity bar animation */
+@keyframes bar-grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.animate-bar-grow {
+  animation: bar-grow 0.6s ease-out forwards;
+  transform-origin: bottom;
+}
+
+/* Staggered fade in */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+/* Number counter animation support */
+@keyframes count-up {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Scroll snap improvements */
+.snap-section {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* Improved scroll snapping */
+.snap-y {
+  scroll-snap-type: y mandatory;
+}
+
+.snap-start {
+  scroll-snap-align: start;
+}
+
+.snap-always {
+  scroll-snap-stop: always;
+}
+
+/* Prevent overscroll bounce */
+.overscroll-none {
+  overscroll-behavior: none;
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

@@ -38,7 +38,7 @@ interface RecapState {
 
 const initialState = {
   currentPage: 0,
-  totalPages: 4,
+  totalPages: 5,
   isLoading: false,
   error: null,
   username: null,
