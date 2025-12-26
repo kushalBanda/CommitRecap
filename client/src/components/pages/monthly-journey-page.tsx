@@ -1,178 +1,158 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { TrendingUp, Calendar, Flame } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { PageContainer } from "@/components/layout/page-container";
-import { MonthlyBarChart } from "@/components/charts/monthly-bar-chart";
-import { AnimatedNumber } from "@/components/shared/animated-number";
+import { useMemo } from "react";
 import { useRecapStore } from "@/stores/recap-store";
+import { AnimatedNumber } from "@/components/shared/animated-number";
+import { KeyboardHint } from "@/components/shared/keyboard-hint";
 
-const MONTH_FULL_NAMES = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
-];
+const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export function MonthlyJourneyPage() {
   const { recapData } = useRecapStore();
 
   if (!recapData) return null;
 
-  const { monthly } = recapData;
+  const { monthly, year } = recapData;
   const monthlyData = monthly.monthly_counts;
 
-  // Calculate stats
-  const entries = Object.entries(monthlyData);
-  const totalCommits = entries.reduce((sum, [, count]) => sum + count, 0);
-  const activeMonths = entries.filter(([, count]) => count > 0).length;
-  const avgPerMonth = activeMonths > 0 ? Math.round(totalCommits / activeMonths) : 0;
-
-  // Find peak month
-  const peakEntry = entries.reduce(
-    (max, [month, count]) => (count > max.count ? { month, count } : max),
-    { month: "", count: 0 }
-  );
-  const peakMonthIndex = peakEntry.month ? parseInt(peakEntry.month.split("-")[1]) - 1 : 0;
-  const peakMonthName = MONTH_FULL_NAMES[peakMonthIndex];
-
-  // Calculate streak
-  const getStreakInfo = () => {
-    let maxStreak = 0;
-    let currentStreak = 0;
-
-    MONTH_FULL_NAMES.forEach((_, index) => {
+  // Transform and calculate stats
+  const { chartData, maxCommits, peakMonthIndex, totalCommits } = useMemo(() => {
+    const data = MONTH_NAMES.map((month, index) => {
       const monthKey = Object.keys(monthlyData).find((key) => {
         const monthNum = parseInt(key.split("-")[1]);
         return monthNum === index + 1;
       });
-      const commits = monthKey ? monthlyData[monthKey] : 0;
-
-      if (commits > 0) {
-        currentStreak++;
-        maxStreak = Math.max(maxStreak, currentStreak);
-      } else {
-        currentStreak = 0;
-      }
+      return {
+        month,
+        commits: monthKey ? monthlyData[monthKey] : 0,
+        index,
+      };
     });
 
-    return maxStreak;
-  };
+    const max = Math.max(...data.map((d) => d.commits), 1);
+    const peak = data.reduce((maxIdx, item, idx, arr) => 
+      item.commits > arr[maxIdx].commits ? idx : maxIdx, 0);
+    const total = data.reduce((sum, d) => sum + d.commits, 0);
 
-  const longestStreak = getStreakInfo();
+    return { chartData: data, maxCommits: max, peakMonthIndex: peak, totalCommits: total };
+  }, [monthlyData]);
+
+  const maxBarHeight = 280; // Fixed max height in pixels
 
   return (
-    <PageContainer id="journey" className="bg-gradient-to-b from-background to-card/20">
-      <div className="space-y-8">
-        {/* Header */}
+    <section className="relative min-h-screen w-full snap-start snap-always flex flex-col">
+      <div className="flex-1 flex flex-col justify-between px-6 md:px-12 lg:px-24 py-12">
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center space-y-2"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-            Your Coding Journey Through 2025
-          </h2>
-          <p className="text-muted-foreground">
-            A month-by-month breakdown of your commit activity
+          {/* Narrative */}
+          <p className="text-narrative">
+            You kept the momentum going:
           </p>
+
+          {/* Large stats row */}
+          <div className="flex gap-16 mt-8">
+            <div>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Commits</p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-display text-foreground font-serif">
+                  <AnimatedNumber value={totalCommits} />
+                </span>
+              </div>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider">Pull Requests</p>
+              <span className="text-display-sm text-muted-foreground font-serif">
+                <AnimatedNumber value={year.pull_requests} />
+              </span>
+            </div>
+          </div>
         </motion.div>
 
-        {/* Stats Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <Card className="p-4 bg-card/50 backdrop-blur text-center">
-              <div className="text-3xl font-bold text-primary">
-                <AnimatedNumber value={totalCommits} />
-              </div>
-              <p className="text-sm text-muted-foreground">Total Commits</p>
-            </Card>
-          </motion.div>
+        {/* Monthly breakdown with numbers */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2, duration: 0.4 }}
+          className="grid grid-cols-6 md:grid-cols-12 gap-x-2 gap-y-4 my-6"
+        >
+          {chartData.map((item) => (
+            <div key={item.month} className="text-left">
+              <p className="text-xs text-muted-foreground">{item.month}</p>
+              <p className={`text-base md:text-lg font-medium ${item.commits > 0 ? "text-foreground" : "text-muted-foreground/40"}`}>
+                {item.commits > 0 ? item.commits : "—"}
+              </p>
+              {item.commits > 0 && (
+                <p className="text-[10px] text-muted-foreground hidden md:block">
+                  {item.commits === 1 ? "Commit" : "Commits"}
+                </p>
+              )}
+            </div>
+          ))}
+        </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+        {/* Bar chart - using pixel heights for reliability */}
+        <div className="flex-1 flex items-end pb-2">
+          <div 
+            className="w-full flex items-end gap-2 md:gap-3 lg:gap-4"
+            style={{ height: maxBarHeight }}
           >
-            <Card className="p-4 bg-card/50 backdrop-blur text-center">
-              <div className="text-3xl font-bold text-[#58a6ff]">
-                <AnimatedNumber value={activeMonths} suffix="/12" />
-              </div>
-              <p className="text-sm text-muted-foreground">Active Months</p>
-            </Card>
-          </motion.div>
+            {chartData.map((item, index) => {
+              // Calculate pixel height based on commits
+              const barHeight = item.commits > 0 
+                ? Math.max(20, (item.commits / maxCommits) * maxBarHeight) 
+                : 8;
+              const isPeak = index === peakMonthIndex && item.commits > 0;
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <Card className="p-4 bg-card/50 backdrop-blur text-center">
-              <div className="text-3xl font-bold text-[#a371f7]">
-                <AnimatedNumber value={avgPerMonth} />
-              </div>
-              <p className="text-sm text-muted-foreground">Avg per Month</p>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <Card className="p-4 bg-card/50 backdrop-blur text-center">
-              <div className="flex items-center justify-center gap-1 text-3xl font-bold text-[#db6d28]">
-                <Flame className="w-6 h-6" />
-                <AnimatedNumber value={longestStreak} />
-              </div>
-              <p className="text-sm text-muted-foreground">Longest Streak</p>
-            </Card>
-          </motion.div>
+              return (
+                <motion.div
+                  key={item.month}
+                  className="flex-1"
+                  initial={{ height: 0 }}
+                  whileInView={{ height: barHeight }}
+                  viewport={{ once: true }}
+                  transition={{
+                    delay: 0.3 + index * 0.04,
+                    duration: 0.4,
+                    ease: "easeOut",
+                  }}
+                >
+                  <div
+                    className={`w-full h-full rounded-t-sm ${
+                      isPeak 
+                        ? "bg-primary" 
+                        : item.commits > 0 
+                          ? "bg-[var(--bar-inactive)]" 
+                          : "bg-[var(--bar-inactive)] opacity-20"
+                    }`}
+                  />
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Chart */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          <MonthlyBarChart data={monthlyData} />
-        </motion.div>
+        {/* Month labels under bars */}
+        <div className="flex gap-2 md:gap-3 lg:gap-4 mt-2">
+          {chartData.map((item, index) => (
+            <div key={`label-${item.month}`} className="flex-1 text-center">
+              <span className={`text-xs ${index === peakMonthIndex && chartData[index].commits > 0 ? "text-primary font-medium" : "text-muted-foreground"}`}>
+                {item.month}
+              </span>
+            </div>
+          ))}
+        </div>
 
-        {/* Peak Month Highlight */}
-        {peakEntry.count > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            className="flex justify-center"
-          >
-            <Card className="p-6 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-primary/30 max-w-md">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
-                  <TrendingUp className="w-8 h-8 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Your Peak Month</p>
-                  <p className="text-2xl font-bold text-foreground">{peakMonthName}</p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Badge variant="secondary" className="bg-primary/20 text-primary">
-                      {peakEntry.count} commits
-                    </Badge>
-                    <span className="text-sm text-muted-foreground">
-                      You were on fire!
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </motion.div>
-        )}
+        {/* Navigation hint */}
+        <div className="flex justify-center mt-6">
+          <KeyboardHint />
+        </div>
       </div>
-    </PageContainer>
+    </section>
   );
 }
