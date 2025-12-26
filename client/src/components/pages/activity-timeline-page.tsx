@@ -118,7 +118,7 @@ export function ActivityTimelinePage() {
           <ActivityBars
             heatmap={heatmap}
             highlightDate={peakDay.date}
-            highlightLabel="Peak Activity"
+            showHighlightLabel={false}
             showMonthLabels={true}
             barWidth={4}
             maxHeight={160}
@@ -133,4 +133,3 @@ export function ActivityTimelinePage() {
     </section>
   );
 }
-
