@@ -121,8 +121,57 @@ export function WelcomePage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1, duration: 0.5 }}
-        className="text-center"
+        className="flex flex-col items-center gap-4"
       >
+        {/* Social Links */}
+        <div className="flex items-center gap-4">
+          <a
+            href="https://www.producthunt.com/products/commitrecap?launch=commitrecap"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors border border-border"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 40 40"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="text-foreground"
+            >
+              <path
+                d="M20 0C8.954 0 0 8.954 0 20s8.954 20 20 20 20-8.954 20-20S31.046 0 20 0zm0 36c-8.837 0-16-7.163-16-16S11.163 4 20 4s16 7.163 16 16-7.163 16-16 16z"
+                fill="currentColor"
+              />
+              <path
+                d="M22 14h-8v12h8c3.314 0 6-2.686 6-6s-2.686-6-6-6zm0 8h-4v-4h4c1.105 0 2 .895 2 2s-.895 2-2 2z"
+                fill="currentColor"
+              />
+            </svg>
+            <span className="text-sm font-medium text-foreground">ProductHunt</span>
+          </a>
+          <a
+            href="https://www.linkedin.com/in/kushalbanda/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors border border-border"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="text-foreground"
+            >
+              <path
+                d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+                fill="currentColor"
+              />
+            </svg>
+            <span className="text-sm font-medium text-foreground">LinkedIn</span>
+          </a>
+        </div>
         <p className="text-xs text-muted-foreground">
           Built with care for developers everywhere
         </p>
