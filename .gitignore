@@ -157,3 +157,7 @@ mcp.json
 # Lambda Layers
 server/python-layer/*
 server/python-dependencies-layer.zip
+
+
+# Client
+client/*

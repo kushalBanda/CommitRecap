@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Query
 
-from server.api.controllers import github_search_controller
-from server.config.env import Environment
+from api.controllers import github_search_controller
+from config.env import Environment
 
 DEFAULT_START_DATE = Environment.START_DATE
 DEFAULT_END_DATE = Environment.END_DATE
