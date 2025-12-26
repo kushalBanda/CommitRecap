@@ -152,3 +152,8 @@ CLAUDE.md
 
 # MCP
 mcp.json
+
+
+# Lambda Layers
+server/python-layer/*
+server/python-dependencies-layer.zip
