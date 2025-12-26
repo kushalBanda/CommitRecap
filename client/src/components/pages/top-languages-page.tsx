@@ -90,33 +90,37 @@ export function TopLanguagesPage() {
 
           {/* Language items */}
           <div className="space-y-6 md:space-y-8">
-            {topLanguages.map((lang, index) => (
-              <motion.div
-                key={lang.name}
-                variants={itemVariants}
-                className="flex items-baseline gap-4 md:gap-8"
-              >
-                {/* Rank number */}
-                <span className="text-sm text-muted-foreground w-6 text-right">
-                  {index + 1}
-                </span>
+            {topLanguages.map((lang, index) => {
+              const isTop = index === 0;
 
-                {/* Language name - massive typography */}
-                <span 
-                  className="text-4xl md:text-6xl lg:text-7xl font-serif text-foreground tracking-tight"
-                  style={{ 
-                    fontSize: `clamp(2rem, ${8 - index}vw, ${5 - index * 0.5}rem)` 
-                  }}
+              return (
+                <motion.div
+                  key={lang.name}
+                  variants={itemVariants}
+                  className="flex items-baseline gap-4 md:gap-8"
                 >
-                  {lang.name}
-                </span>
+                  {/* Rank number */}
+                  <span className="text-sm text-muted-foreground w-6 text-right">
+                    {index + 1}
+                  </span>
 
-                {/* Percentage */}
-                <span className="text-sm md:text-base text-muted-foreground">
-                  {lang.percentage.toFixed(0)}%
-                </span>
-              </motion.div>
-            ))}
+                  {/* Language name - massive typography */}
+                  <span 
+                    className={`text-4xl md:text-6xl lg:text-7xl font-serif tracking-tight ${isTop ? "text-primary" : "text-foreground"}`}
+                    style={{ 
+                      fontSize: `clamp(2rem, ${8 - index}vw, ${5 - index * 0.5}rem)` 
+                    }}
+                  >
+                    {lang.name}
+                  </span>
+
+                  {/* Percentage */}
+                  <span className={`text-sm md:text-base ${isTop ? "text-primary" : "text-muted-foreground"}`}>
+                    {lang.percentage.toFixed(0)}%
+                  </span>
+                </motion.div>
+              );
+            })}
           </div>
         </motion.div>
 
@@ -128,4 +132,3 @@ export function TopLanguagesPage() {
     </section>
   );
 }
-
