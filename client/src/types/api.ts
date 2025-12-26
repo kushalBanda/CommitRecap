@@ -105,6 +105,29 @@ export interface RepoCount {
   repo_count: number;
 }
 
+export interface CommitSizeStats {
+  count: number;
+  min: number;
+  max: number;
+  median: number;
+  p75: number;
+  p90: number;
+  p95: number;
+  average: number;
+}
+
+export interface CommitSizeDistribution {
+  username: string;
+  since: string;
+  until: string;
+  top_repos: number;
+  max_commits_per_repo: number;
+  stats: CommitSizeStats;
+  per_repo_commit_counts: Record<string, number>;
+  story: string;
+  source: string;
+}
+
 // Combined data for the recap
 export interface RecapData {
   user: UserSummary;
@@ -114,4 +137,5 @@ export interface RecapData {
   heatmap: ContributionHeatmap;
   languages: Languages;
   languageStars: TopLanguagesByStars;
+  commitSizes: CommitSizeDistribution;
 }

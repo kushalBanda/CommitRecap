@@ -7,6 +7,7 @@ import type {
   ContributionHeatmap,
   Languages,
   TopLanguagesByStars,
+  CommitSizeDistribution,
   RecapData,
 } from "@/types/api";
 
@@ -55,11 +56,14 @@ export const api = {
 
   fetchTopLanguagesByStars: (username: string): Promise<TopLanguagesByStars> =>
     apiClient.get(`/github/search/top-languages-by-stars?username=${username}`),
+
+  fetchCommitSizeDistribution: (username: string): Promise<CommitSizeDistribution> =>
+    apiClient.get(`/github/search/commit-size-distribution?username=${username}`),
 };
 
 // Fetch all data in parallel
 export async function fetchAllRecapData(username: string): Promise<RecapData> {
-  const [user, year, monthly, repos, heatmap, languages, languageStars] =
+  const [user, year, monthly, repos, heatmap, languages, languageStars, commitSizes] =
     await Promise.all([
       api.fetchUserSummary(username),
       api.fetchYearSummary(username),
@@ -68,7 +72,8 @@ export async function fetchAllRecapData(username: string): Promise<RecapData> {
       api.fetchContributionHeatmap(username),
       api.fetchLanguages(username),
       api.fetchTopLanguagesByStars(username),
+      api.fetchCommitSizeDistribution(username),
     ]);
 
-  return { user, year, monthly, repos, heatmap, languages, languageStars };
+  return { user, year, monthly, repos, heatmap, languages, languageStars, commitSizes };
 }
