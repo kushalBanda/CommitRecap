@@ -12,7 +12,7 @@ import { TopLanguagesPage } from "@/components/pages/top-languages-page";
 import { BattleCardPage } from "@/components/pages/battle-card-page";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -160,28 +160,42 @@ export default function RecapPage() {
   }
 
   return (
-    <div
-      ref={containerRef}
-      onScroll={handleScroll}
-      className="h-screen overflow-y-auto snap-y snap-mandatory scrollbar-hide overscroll-none"
-    >
-      {/* Page 1: Opening Hook */}
-      <OpeningPage />
+    <>
+      {/* Homepage Button */}
+      <Link href="/" className="fixed top-6 right-6 z-50">
+        <Button
+          variant="outline"
+          size="icon"
+          className="w-12 h-12 rounded-full bg-background/80 backdrop-blur-sm border-border hover:bg-secondary/80 transition-colors shadow-lg"
+          title="Back to Home"
+        >
+          <Home className="w-5 h-5 text-foreground" />
+        </Button>
+      </Link>
 
-      {/* Page 2: Activity Timeline */}
-      <ActivityTimelinePage />
+      <div
+        ref={containerRef}
+        onScroll={handleScroll}
+        className="h-screen overflow-y-auto snap-y snap-mandatory scrollbar-hide overscroll-none"
+      >
+        {/* Page 1: Opening Hook */}
+        <OpeningPage />
 
-      {/* Page 3: Monthly Journey */}
-      <MonthlyJourneyPage />
+        {/* Page 2: Activity Timeline */}
+        <ActivityTimelinePage />
 
-      {/* Page 4: Commit Size Distribution */}
-      <CommitSizeDistributionPage />
+        {/* Page 3: Monthly Journey */}
+        <MonthlyJourneyPage />
 
-      {/* Page 5: Top Languages */}
-      <TopLanguagesPage />
+        {/* Page 4: Commit Size Distribution */}
+        <CommitSizeDistributionPage />
 
-      {/* Page 6: Summary Card */}
-      <BattleCardPage />
-    </div>
+        {/* Page 5: Top Languages */}
+        <TopLanguagesPage />
+
+        {/* Page 6: Summary Card */}
+        <BattleCardPage />
+      </div>
+    </>
   );
 }
