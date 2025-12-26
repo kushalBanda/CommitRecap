@@ -8,7 +8,7 @@ from typing import Any, Dict, Optional
 
 import requests
 from fastapi import HTTPException
-from server.config.env import Environment
+from config.env import Environment
 
 GITHUB_BASE_URL = Environment.GITHUB_BASE_URL
 GITHUB_TOKEN = Environment.GITHUB_TOKEN
