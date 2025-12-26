@@ -1,0 +1,105 @@
+name: Deploy to AWS Lambda
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/**'
+      - '.github/workflows/deploy-lambda.yml'
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  LAMBDA_FUNCTION_NAME: commitRecap
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  deploy:
+    name: Deploy to Lambda
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: server/requirements.txt
+
+      - name: Create deployment package (code only)
+        run: |
+          # Create deployment directory
+          mkdir -p deployment
+
+          # Copy application code only (no dependencies)
+          cp main.py deployment/
+          cp lambda_handler.py deployment/
+          cp -r api deployment/
+          cp -r config deployment/
+          cp -r schemas deployment/
+          cp -r services deployment/
+          cp -r utils deployment/
+          cp -r telemetry deployment/ 2>/dev/null || true
+
+          # Create zip file (excluding unnecessary files)
+          cd deployment
+          zip -r ../lambda-deployment.zip . \
+            -x "*.git*" \
+            "*__pycache__*" \
+            "*.pyc" \
+            ".env" \
+            ".DS_Store" \
+            "*.venv*"
+          cd ..
+
+          # Show zip size and contents
+          echo "📦 Deployment package created:"
+          ls -lh lambda-deployment.zip
+          echo ""
+          echo "📄 Package contents:"
+          unzip -l lambda-deployment.zip | head -25
+          echo "..."
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update Lambda function code
+        run: |
+          aws lambda update-function-code \
+            --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
+            --zip-file fileb://lambda-deployment.zip \
+            --region ${{ env.AWS_REGION }}
+
+          echo "Lambda function updated successfully!"
+
+      - name: Wait for update to complete
+        run: |
+          aws lambda wait function-updated \
+            --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Get function info
+        run: |
+          aws lambda get-function \
+            --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
+            --region ${{ env.AWS_REGION }} \
+            --query 'Configuration.[FunctionName,Runtime,LastModified,CodeSha256]' \
+            --output table
+
+      - name: Deployment Summary
+        run: |
+          echo "### Lambda Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Function Name:** ${{ env.LAMBDA_FUNCTION_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Region:** ${{ env.AWS_REGION }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
