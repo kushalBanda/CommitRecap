@@ -138,6 +138,9 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+# assets/reference
+assets/reference/*
+
 # chat
 chat/*
 
