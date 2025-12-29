@@ -7,12 +7,12 @@ CommitRecap turns a GitHub username into a clean year-in-review of commits, pull
 
 ## What you get
 
-- a user summary card with public profile details
-- year totals for commits, issues, pull requests, and reviews
-- monthly commit counts 
-- repo focus and collaboration footprint stats
-- contribution heatmap data for charts
-- language usage by bytes and by repo stars
+- User summary card with public profile details
+- Year totals for commits, issues, pull requests, and reviews
+- Monthly commit counts 
+- Repo focus and collaboration footprint stats
+- Contribution heatmap data for charts
+- Language usage by bytes and by repo stars
 
 ## Product Walkthrough
 
