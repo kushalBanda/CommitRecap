@@ -1,8 +1,9 @@
 # CommitRecap
 
 CommitRecap turns a GitHub username into a clean year-in-review of commits, pull requests, reviews, languages, and repo focus.
-Live site: https://commit-recap.vercel.app
-Product Hunt: https://www.producthunt.com/products/commitrecap?launch=commitrecap
+
+- Live site: https://commit-recap.vercel.app
+- Product Hunt: https://www.producthunt.com/products/commitrecap?launch=commitrecap
 
 ## What you get
 
